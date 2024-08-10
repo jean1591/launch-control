@@ -13,10 +13,12 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { data: userData, error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     })
+    // TODO: create user if not in DB
+    console.log('🚀 ~ GET ~ userData:', userData)
 
     if (!error) {
       redirect(next)
