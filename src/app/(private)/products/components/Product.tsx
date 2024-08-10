@@ -3,7 +3,7 @@ import { Product as ProductType } from '@/app/lib/interfaces/products'
 
 export const Product = ({ product }: { product: ProductType }) => {
   return (
-    <div className="rounded-md bg-secondary px-4 py-8 text-white shadow-md">
+    <div className="cursor-pointer rounded-lg border-[1px] border-slate-800/5 bg-slate-50 px-4 py-12 shadow-lg transition duration-500 hover:bg-slate-100 hover:shadow-none">
       <div className="flex items-center justify-start gap-x-2">
         <Image
           src={product.thumbnail}
