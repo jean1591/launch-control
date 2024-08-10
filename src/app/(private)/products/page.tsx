@@ -1,10 +1,15 @@
-'use client'
+import { Hero } from './components/Hero'
+import { Products } from './components/Products'
 
-import { RootState } from '@/app/lib/store/store'
-import { useSelector } from 'react-redux'
+// TODO: get data from API
+export default function ProductsPage() {
+  return (
+    <div>
+      <Hero />
 
-export default function Products() {
-  const { username } = useSelector((state: RootState) => state.user)
-
-  return <p>Hello {username}</p>
+      <div className="mt-20">
+        <Products />
+      </div>
+    </div>
+  )
 }
