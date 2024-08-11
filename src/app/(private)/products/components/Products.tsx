@@ -1,6 +1,7 @@
 'use client'
 
 import { AddProductButton } from './AddProductButton'
+import { AddProductModal } from './AddProductModal'
 import { ProductItem } from './ProductItem'
 import { ProductModal } from './ProductModal'
 import { RootState } from '@/app/lib/store/store'
@@ -8,7 +9,7 @@ import { products } from '@/app/lib/constants/products'
 import { useSelector } from 'react-redux'
 
 export const Products = () => {
-  const { displayProductModal } = useSelector(
+  const { displayAddProductModal, displayProductModal } = useSelector(
     (state: RootState) => state.interactions
   )
 
@@ -22,6 +23,7 @@ export const Products = () => {
       </div>
 
       {displayProductModal && <ProductModal />}
+      {displayAddProductModal && <AddProductModal />}
     </div>
   )
 }
