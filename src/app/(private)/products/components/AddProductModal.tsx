@@ -1,4 +1,3 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react'
 import {
   Dialog,
   DialogBackdrop,
@@ -7,19 +6,27 @@ import {
 } from '@headlessui/react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { NewProduct } from '@/app/lib/interfaces/products'
 import { RootState } from '@/app/lib/store/store'
+import { isEmpty } from 'lodash'
 import { setDisplayAddProductModal } from '@/app/lib/store/features/interactions/slice'
+import toast from 'react-hot-toast'
+import { useState } from 'react'
 
-interface Product {
-  name: string
-  productHunt?: string
-  hackerNews?: string
-  reddit?: string
-}
+const notifyNoName = () =>
+  toast.error('A product must have a name', { duration: 5000 })
 
-// TODO: form does not work
+const notifyNoApps = () =>
+  toast.error('At least one app ID must be filled', { duration: 5000 })
+
+const notifySuccess = () => toast.success('App added !', { duration: 5000 })
+
 export const AddProductModal = () => {
-  const [product, setProduct] = useState<Product>({ name: '' })
+  const [name, setName] = useState<string>('')
+  const [productHunt, setProductHunt] = useState<string>('')
+  const [hackerNews, setHackerNews] = useState<string>('')
+  const [reddit, setReddit] = useState<string>('')
+
   const dispatch = useDispatch()
 
   const { displayAddProductModal } = useSelector(
@@ -27,7 +34,33 @@ export const AddProductModal = () => {
   )
 
   const handleOnSubmit = () => {
-    console.log('🚀 ~ AddProductModal ~ product:', product)
+    if (isEmpty(name)) {
+      notifyNoName()
+      return
+    }
+
+    if (isEmpty(hackerNews) && isEmpty(productHunt) && isEmpty(reddit)) {
+      notifyNoApps()
+      return
+    }
+
+    const product: NewProduct = {
+      hackerNews,
+      name,
+      productHunt,
+      reddit,
+    }
+
+    ;(async function addProduct() {
+      await fetch(`/api/products`, {
+        method: 'POST',
+        body: JSON.stringify({ product }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+    })()
+
+    dispatch(setDisplayAddProductModal(false))
+    notifySuccess()
   }
 
   return (
@@ -53,30 +86,75 @@ export const AddProductModal = () => {
               </DialogTitle>
 
               <div className="mt-12 flex flex-col gap-y-8">
-                <InputString
-                  id="name"
-                  label="Project Name"
-                  product={product}
-                  setProduct={setProduct}
-                />
-                <InputString
-                  id="productHunt"
-                  label="Product Hunt"
-                  product={product}
-                  setProduct={setProduct}
-                />
-                <InputString
-                  id="reddit"
-                  label="Reddit"
-                  product={product}
-                  setProduct={setProduct}
-                />
-                <InputString
-                  id="hackerNews"
-                  label="Hacker News"
-                  product={product}
-                  setProduct={setProduct}
-                />
+                <div className="relative">
+                  <label
+                    htmlFor="name"
+                    className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium"
+                  >
+                    Name
+                  </label>
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={name}
+                    required
+                    onChange={(e) => setName(e.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-slate-800/5 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                  />
+                </div>
+                <div className="relative">
+                  <label
+                    htmlFor="productHunt"
+                    className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium"
+                  >
+                    Product Hunt ID
+                  </label>
+
+                  <input
+                    id="productHunt"
+                    name="productHunt"
+                    type="text"
+                    value={productHunt}
+                    onChange={(e) => setProductHunt(e.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-slate-800/5 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                  />
+                </div>
+                <div className="relative">
+                  <label
+                    htmlFor="hackerNews"
+                    className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium"
+                  >
+                    Hacker News ID
+                  </label>
+
+                  <input
+                    id="hackerNews"
+                    name="hackerNews"
+                    type="text"
+                    value={hackerNews}
+                    onChange={(e) => setHackerNews(e.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-slate-800/5 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                  />
+                </div>
+                <div className="relative">
+                  <label
+                    htmlFor="reddit"
+                    className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium"
+                  >
+                    Reddit ID
+                  </label>
+
+                  <input
+                    id="reddit"
+                    name="reddit"
+                    type="text"
+                    value={reddit}
+                    onChange={(e) => setReddit(e.target.value)}
+                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-slate-800/5 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                  />
+                </div>
 
                 <div className="flex items-center justify-end">
                   <button
@@ -93,41 +171,5 @@ export const AddProductModal = () => {
         </div>
       </div>
     </Dialog>
-  )
-}
-
-const InputString = ({
-  id,
-  label,
-  product,
-  setProduct,
-}: {
-  id: keyof Product
-  label: string
-  product: Product
-  setProduct: (product: Product) => void
-}) => {
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setProduct({ ...product, [id]: event.target.value })
-  }
-
-  return (
-    <div className="relative">
-      <label
-        htmlFor={id}
-        className="absolute -top-2 left-2 inline-block bg-white px-1 text-xs font-medium"
-      >
-        {label}
-      </label>
-
-      <input
-        id={id}
-        name={id}
-        type="text"
-        value={product[id]}
-        onChange={(e) => handleChange(e)}
-        className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-slate-800/5 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-      />
-    </div>
   )
 }
