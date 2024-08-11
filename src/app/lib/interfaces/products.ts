@@ -1,1 +1,14 @@
-export type Product = { thumbnail: string; name: string; tagline: string }
+type Stat = {
+  app: string
+  upvotes: number
+  commentCount: number
+}
+
+export type Product = {
+  createdAt: string
+  description: string
+  name: string
+  stats: Stat[]
+  tagline: string
+  thumbnail: string
+}
