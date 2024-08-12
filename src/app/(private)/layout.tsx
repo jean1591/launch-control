@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import { setUsername } from '../lib/store/features/user/slice'
+import { setEmail } from '../lib/store/features/user/slice'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -28,7 +28,7 @@ export default function PrivateLayout({
 
         const { user } = data
 
-        dispatch(setUsername(user.email!))
+        dispatch(setEmail(user.email!))
       } catch (error) {
         console.error('An error occured when fetching logged in user')
         router.push('/login')

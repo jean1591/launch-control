@@ -20,13 +20,15 @@ export const ProductItem = ({ product }: { product: Product }) => {
       onClick={handleOnClick}
     >
       <div className="flex items-center justify-start gap-x-2">
-        <Image
-          src={product.thumbnail}
-          width={20}
-          height={20}
-          alt={`${product.name} app thumbnail`}
-          className="rounded-full"
-        />
+        {product.thumbnail && (
+          <Image
+            src={product.thumbnail}
+            width={20}
+            height={20}
+            alt={`${product.name} app thumbnail`}
+            className="rounded-full"
+          />
+        )}
         <p className="text-xl font-bold">{product.name}</p>
       </div>
       <p className="text-base">{product.tagline}</p>
