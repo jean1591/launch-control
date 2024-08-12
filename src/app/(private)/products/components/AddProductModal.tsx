@@ -5,19 +5,13 @@ import {
   DialogTitle,
 } from '@headlessui/react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 
 import { NewProduct } from '@/app/lib/interfaces/products'
 import { RootState } from '@/app/lib/store/store'
 import { isEmpty } from 'lodash'
 import { setDisplayAddProductModal } from '@/app/lib/store/features/interactions/slice'
 import toast from 'react-hot-toast'
-import { useState } from 'react'
-
-const notifyNoName = () =>
-  toast.error('A product must have a name', { duration: 5000 })
-
-const notifyNoApps = () =>
-  toast.error('At least one app ID must be filled', { duration: 5000 })
 
 const notifySuccess = () => toast.success('App added !', { duration: 5000 })
 
@@ -26,6 +20,7 @@ export const AddProductModal = () => {
   const [productHunt, setProductHunt] = useState<string>('')
   const [hackerNews, setHackerNews] = useState<string>('')
   const [reddit, setReddit] = useState<string>('')
+  const [disabled, setIsDisabled] = useState<boolean>(true)
 
   const dispatch = useDispatch()
 
@@ -35,12 +30,10 @@ export const AddProductModal = () => {
 
   const handleOnSubmit = () => {
     if (isEmpty(name)) {
-      notifyNoName()
       return
     }
 
     if (isEmpty(hackerNews) && isEmpty(productHunt) && isEmpty(reddit)) {
-      notifyNoApps()
       return
     }
 
@@ -62,6 +55,22 @@ export const AddProductModal = () => {
     dispatch(setDisplayAddProductModal(false))
     notifySuccess()
   }
+
+  useEffect(() => {
+    if (isEmpty(name)) {
+      setIsDisabled(true)
+
+      return
+    }
+
+    if (isEmpty(productHunt) && isEmpty(hackerNews) && isEmpty(reddit)) {
+      setIsDisabled(true)
+
+      return
+    }
+
+    setIsDisabled(false)
+  }, [name, productHunt, hackerNews, reddit])
 
   return (
     <Dialog
@@ -158,9 +167,10 @@ export const AddProductModal = () => {
 
                 <div className="flex items-center justify-end">
                   <button
+                    disabled={disabled}
                     onClick={handleOnSubmit}
                     type="button"
-                    className="cursor-pointer rounded-lg border-[1px] border-green-400 bg-green-200 px-8 py-2 text-center font-medium uppercase text-green-700 shadow-lg transition duration-500 hover:bg-green-100 hover:shadow-none"
+                    className="cursor-pointer rounded-lg border-[1px] border-green-400 bg-green-200 px-8 py-2 text-center font-medium uppercase text-green-700 shadow-lg transition duration-500 hover:bg-green-100 hover:shadow-none disabled:border-slate-400 disabled:bg-slate-200 disabled:text-slate-700"
                   >
                     Add product
                   </button>
